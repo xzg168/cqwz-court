@@ -106,11 +106,11 @@ export default {
       this.visible = true;
       this.title = "编辑文书";
       //编辑页面禁止修改角色编码
-      if (this.model.id) {
-        this.roleDisabled = true;
-      } else {
-        this.roleDisabled = false;
-      }
+      // if (this.model.id) {
+      //   this.roleDisabled = true;
+      // } else {
+      //   this.roleDisabled = false;
+      // }
       this.$nextTick(() => {
         this.form
           .setFieldsValue
