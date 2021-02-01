@@ -41,7 +41,7 @@
     <h3 class="fieldDescription">原告信息</h3>
     <!-- 原告 -->
     <div v-for="(item, index1) in ygData" :key="index1 + 100">
-      <h3 class="dsrBj">原告{{ SectionToChinese(index1 + 1) }}</h3>
+      <!-- <h3 class="dsrBj">原告{{ SectionToChinese(index1 + 1) }}</h3> -->
       <NaturalOrPerson :item="item" />
     </div>
     <h3 class="fieldDescription">代理人信息</h3>

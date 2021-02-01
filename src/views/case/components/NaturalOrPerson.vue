@@ -206,9 +206,9 @@ export default {
 /* @import url(); 引入公共css类*/
 .niceBorder {
   // border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 20px;
-  box-shadow: 0 0 10px #ccc inset;
+  // border-radius: 5px;
+  // padding: 20px;
+  // box-shadow: 0 0 10px #ccc inset;
 }
 .centerP {
   width: 150px;
