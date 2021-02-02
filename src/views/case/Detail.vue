@@ -30,10 +30,10 @@
           <application-info ref="applicationRef"></application-info>
         </a-tab-pane>
         <a-tab-pane key="2" tab="案件跟踪">
-          <OperationRecord />
+          <OperationRecord ref="recordRef" />
         </a-tab-pane>
         <a-tab-pane key="3" tab="案件文书">
-          <WsList />
+          <WsList ref="wsRef" />
         </a-tab-pane>
       </a-tabs>
     </a-page-header>
@@ -80,21 +80,9 @@ export default {
             this.$refs.applicationRef.getInfo(this.detailId);
             break;
           case "2":
-            this.$refs.dsrRef.getInfo(this.detailId);
+            this.$refs.recordRef.getInfo(this.detailId);
             break;
           case "3":
-            this.$refs.zjRef.getInfo(this.detailId);
-            break;
-          case "4":
-            this.$refs.lcRef.getInfo(this.detailId);
-            break;
-          case "5":
-            this.$refs.tjRef.getInfo(this.detailId);
-            break;
-          case "6":
-            this.$refs.laRef.getInfo(this.detailId);
-            break;
-          case "7":
             this.$refs.wsRef.getInfo(this.detailId);
             break;
         }

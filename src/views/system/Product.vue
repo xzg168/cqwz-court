@@ -60,6 +60,11 @@
           <a href="javascript:;">删除</a>
         </div>
       </template>
+      <template slot="useStatus">
+        <div>
+          <a-switch checked-children="ON" un-checked-children="OFF" />
+        </div>
+      </template>
     </a-table>
     <div :style="{ textAlign: 'right', padding: '20px 0' }">
       <a-pagination
@@ -120,28 +125,35 @@ export default {
         {
           title: "产品名称",
           dataIndex: "name",
+          align: "center",
           scopedSlots: { customRender: "name" }
         },
         {
           title: "描述",
           className: "column-money",
+          align: "center",
           dataIndex: "money"
         },
         {
           title: "文书名称",
-          dataIndex: "address"
+          dataIndex: "address",
+          align: "center"
         },
         {
           title: "是否启用",
-          dataIndex: "address1"
+          align: "center",
+          dataIndex: "address1",
+          scopedSlots: { customRender: "useStatus" }
         },
         {
           title: "创建时间",
+          align: "center",
           dataIndex: "address2"
         },
         {
           title: "操作",
           dataIndex: "address12",
+          align: "center",
           fixed: "right",
           scopedSlots: { customRender: "action" }
         }

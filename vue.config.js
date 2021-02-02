@@ -1,4 +1,9 @@
 module.exports = {
+  configureWebpack: config => {
+    return {
+      title: "重庆万州法院"
+    };
+  },
   css: {
     loaderOptions: {
       less: {
@@ -15,7 +20,7 @@ module.exports = {
     proxy: {
       // detail: https://cli.vuejs.org/config/#devserver-proxy
       ["/api"]: {
-        target: `http://localhost:8080`,
+        target: `https://mockapi.eolinker.com/MdNERTV6a93526922e0ab9a08284ab81c78abe2f65ec475`,
         changeOrigin: true,
         pathRewrite: {
           ["^/pai"]: ""

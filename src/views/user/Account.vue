@@ -14,23 +14,10 @@
             >
               <a-input
                 placeholder="请输入用户姓名"
-                v-model="queryParam.roleName"
+                v-model="queryParam.name"
               ></a-input>
             </a-form-item>
           </a-col>
-          <a-col :md="6" :sm="8">
-            <a-form-item
-              label="角色名称"
-              :labelCol="{ span: 6 }"
-              :wrapperCol="{ span: 17, offset: 1 }"
-            >
-              <a-input
-                placeholder="请输入角色名称"
-                v-model="queryParam.caseno"
-              ></a-input>
-            </a-form-item>
-          </a-col>
-
           <span
             style="float: left;overflow: hidden;"
             class="table-page-search-submitButtons"
@@ -52,9 +39,6 @@
       rowKey="id"
       :pagination="false"
     >
-      <template slot="name" slot-scope="text">
-        <a>{{ text }}</a>
-      </template>
       <template slot="title">
         <a-row>
           <a-col :span="12">数据列表</a-col>
@@ -69,7 +53,17 @@
         <div>
           <a href="javascript:;" @click="handleEdit(text)">编辑</a>
           <a-divider type="vertical" />
-          <a href="javascript:;">删除</a>
+          <a href="javascript:;" @click="handleRemove(text)">删除</a>
+        </div>
+      </template>
+      <template slot="useStatus" slot-scope="text, record">
+        <div>
+          <a-switch
+            checked-children="ON"
+            un-checked-children="OFF"
+            :defaultChecked="text === 1 ? true : false"
+            @change="e => changeStatus(e, record)"
+          />
         </div>
       </template>
     </a-table>
@@ -77,12 +71,14 @@
       <a-pagination
         show-quick-jumper
         show-size-changer
-        :default-current="1"
-        :total="500"
+        :total="total"
+        v-model="queryParam.pageNum"
+        :page-size.sync="queryParam.pageSize"
+        @showSizeChange="onShowSizeChange"
         @change="onPagChange"
       />
     </div>
-    <AddModal ref="addRef" />
+    <AddModal ref="addRef" @ok="getData" />
   </div>
 </template>
 
@@ -92,22 +88,28 @@
 import AddModal from "./modal/AddModal";
 const data = [
   {
-    key: "1",
+    id: "1",
     name: "John Brown",
-    money: "￥300,000.00",
-    address: "New York No. 1 Lake Park"
+    is_type: 1,
+    mailbox: "123@qq.com",
+    create_time: "2021-2-9",
+    account: "admin"
   },
   {
-    key: "2",
-    name: "Jim Green",
-    money: "￥1,256,000.00",
-    address: "London No. 1 Lake Park"
+    id: "2",
+    name: "John Brown",
+    is_type: 1,
+    mailbox: "123@qq.com",
+    create_time: "2021-2-9",
+    account: "admin"
   },
   {
-    key: "3",
-    name: "Joe Black",
-    money: "￥120,000.00",
-    address: "Sidney No. 1 Lake Park"
+    id: "3",
+    name: "John Brown",
+    is_type: 2,
+    mailbox: "123@qq.com",
+    create_time: "2021-2-9",
+    account: "admin"
   }
 ];
 
@@ -119,36 +121,42 @@ export default {
     //这里存放数据
     return {
       queryParam: {
-        caseType: "a"
+        name: "",
+        pageNum: 1,
+        pageSize: 20
       },
+      total: 0,
       data,
       columns: [
         {
           title: "账号",
-          dataIndex: "name",
-          scopedSlots: { customRender: "name" }
+          dataIndex: "account",
+          align: "center"
         },
         {
           title: "姓名",
-          className: "column-money",
-          dataIndex: "money"
+          align: "center",
+          dataIndex: "name"
         },
         {
           title: "邮箱地址",
-          dataIndex: "address"
+          dataIndex: "mailbox",
+          align: "center"
         },
         {
           title: "添加时间",
-          dataIndex: "address1"
+          dataIndex: "create_time",
+          align: "center"
         },
         {
           title: "是否启用",
-          dataIndex: "address2"
+          dataIndex: "is_type",
+          align: "center",
+          scopedSlots: { customRender: "useStatus" }
         },
         {
           title: "操作",
-          dataIndex: "address12",
-          fixed: "right",
+          align: "center",
           scopedSlots: { customRender: "action" }
         }
       ],
@@ -161,16 +169,63 @@ export default {
   watch: {},
   //方法集合
   methods: {
-    searchQuery() {},
-    searchReset() {},
+    // 获取列表项
+    getData() {
+      let params = JSON.parse(JSON.stringify(this.queryParam));
+      this.$http.get("/admin/list", { params: params }).then(res => {
+        if (res.code === 200) {
+          this.total = res.data.total;
+          this.data = res.data.list;
+        }
+      });
+    },
+    // 查询
+    searchQuery() {
+      this.getData();
+    },
+    // 重置
+    searchReset() {
+      this.queryParam = {
+        name: "",
+        pageNum: 1,
+        pageSize: 20
+      };
+      this.getData();
+    },
+    // 显示分页pageSize
+    onShowSizeChange(current, pageSize) {
+      console.log(current, pageSize);
+      this.queryParam.pageNum = current;
+      this.queryParam.pageSize = pageSize;
+      this.getData();
+    },
+    // 分页跳转
     onPagChange(pageNumber) {
-      console.log("Page: ", pageNumber);
+      // this.queryParam.current = pageNumber;
+      this.getData();
+    },
+    // 改变状态
+    changeStatus(checked, record) {
+      console.log("checked", checked, record);
+      this.$http.post("/admin/updateTypeById", { id: record.id }).then(res => {
+        if (res.code === 200) {
+          this.$message.success(res.message);
+        }
+      });
     },
     handleAdd() {
       this.$refs.addRef.add();
     },
     handleEdit(record) {
       this.$refs.addRef.edit(record);
+    },
+    handleRemove(record) {
+      this.$http.post("/admin/fakeDelete", { id: record.id }).then(res => {
+        if (res.code === 200) {
+          this.$message.success(res.message);
+          this.getData();
+        }
+      });
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）

@@ -125,7 +125,7 @@
       bordered
       rowKey="id"
       :row-selection="rowSelection"
-      :scroll="{ x: 'calc(1700px + 50%)' }"
+      :scroll="{ x: 'calc(1700px + 80%)' }"
       :pagination="false"
     >
       <template slot="name" slot-scope="text">
@@ -258,72 +258,89 @@ export default {
         {
           title: "序号",
           width: 80,
+          align: "center",
           customRender: (text, record, index) => `${index + 1}`
         },
         {
           title: "案件号",
           dataIndex: "name",
+          align: "center",
           scopedSlots: { customRender: "name" }
         },
         {
           title: "案由",
           className: "column-money",
+          align: "center",
           dataIndex: "money"
         },
         {
           title: "申请人",
+          align: "center",
           dataIndex: "address"
         },
         {
           title: "被申请人",
+          align: "center",
           dataIndex: "address1"
         },
         {
           title: "产品类型",
+          align: "center",
           dataIndex: "address2"
         },
         {
           title: "标的金额（元）",
+          align: "center",
           dataIndex: "address3"
         },
         {
           title: "创建时间",
+          align: "center",
           dataIndex: "address4"
         },
         {
           title: "收案时间",
+          align: "center",
           dataIndex: "address5"
         },
         {
           title: "立案时间",
+          align: "center",
           dataIndex: "address6"
         },
         {
           title: "排期时间",
+          align: "center",
           dataIndex: "address7"
         },
         {
           title: "结案时间",
+          align: "center",
           dataIndex: "address8"
         },
         {
           title: "提交送达结案时间",
+          align: "center",
           dataIndex: "address9"
         },
         {
           title: "文书",
+          align: "center",
           dataIndex: "address0"
         },
         {
           title: "状态",
+          align: "center",
           dataIndex: "address10"
         },
         {
           title: "操作步骤",
+          align: "center",
           dataIndex: "address11"
         },
         {
           title: "操作",
+          align: "center",
           dataIndex: "address12",
           fixed: "right",
           scopedSlots: { customRender: "action" }

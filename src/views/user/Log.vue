@@ -121,19 +121,23 @@ export default {
         {
           title: "操作者",
           dataIndex: "name",
+          align: "center",
           scopedSlots: { customRender: "name" }
         },
         {
           title: "操作日期",
+          align: "center",
           className: "column-money",
           dataIndex: "money"
         },
         {
           title: "IP地址",
+          align: "center",
           dataIndex: "address"
         },
         {
           title: "操作记录",
+          align: "center",
           dataIndex: "address1"
         }
       ],

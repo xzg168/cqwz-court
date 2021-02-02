@@ -12,8 +12,17 @@
   >
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="账号">
-          <a-input v-decorator="['zName', validatorRules.zName]"> </a-input>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="账号"
+          extra="默认密码为“123456”，登录后可修改密码"
+        >
+          <a-input
+            v-decorator="['account', validatorRules.account]"
+            :disabled="isDisabled"
+          >
+          </a-input>
         </a-form-item>
 
         <a-form-item
@@ -21,22 +30,21 @@
           :wrapperCol="wrapperCol"
           label="成员姓名"
         >
-          <a-input v-decorator="['cName']" />
+          <a-input v-decorator="['name']" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="邮箱地址"
-          extra="默认密码为“123456”，登录后可修改密码"
         >
-          <a-input v-decorator="['yName']" />
+          <a-input v-decorator="['mailbox']" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="备注信息"
         >
-          <a-textarea v-decorator="['cName']" />
+          <a-textarea v-decorator="['bz']" />
         </a-form-item>
       </a-form>
     </a-spin>
@@ -52,7 +60,7 @@ export default {
     return {
       title: "账号",
       visible: false,
-      roleDisabled: false,
+      isDisabled: false,
       model: {},
       labelCol: {
         xs: { span: 24 },
@@ -65,7 +73,7 @@ export default {
       confirmLoading: false,
       form: this.$form.createForm(this),
       validatorRules: {
-        zName: {
+        account: {
           rules: [
             { required: true, message: "请输入账号!" },
             {
@@ -88,18 +96,15 @@ export default {
       this.form.resetFields();
       this.model = Object.assign({}, record);
       this.visible = true;
-
+      this.confirmLoading = false;
       //编辑页面禁止修改角色编码
       if (this.model.id) {
-        this.roleDisabled = true;
+        this.isDisabled = true;
       } else {
-        this.roleDisabled = false;
+        this.isDisabled = false;
       }
       this.$nextTick(() => {
-        this.form
-          .setFieldsValue
-          //   pick(this.model, "roleName", "description", "roleCode")
-          ();
+        this.form.setFieldsValue(record);
       });
     },
     close() {
@@ -113,8 +118,14 @@ export default {
         if (!err) {
           that.confirmLoading = true;
           let formData = Object.assign(this.model, values);
-          let obj;
           console.log(formData);
+          this.$http.post("/admin/update", { ...formData }).then(res => {
+            if (res.code === 200) {
+              this.confirmLoading = false;
+              this.visible = false;
+              this.$emit("ok");
+            }
+          });
         }
       });
     },

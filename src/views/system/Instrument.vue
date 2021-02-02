@@ -127,20 +127,24 @@ export default {
         {
           title: "文书名称",
           dataIndex: "name",
+          align: "center",
           scopedSlots: { customRender: "name" }
         },
         {
           title: "文书描述",
+          align: "center",
           className: "column-money",
           dataIndex: "money"
         },
         {
           title: "状态",
+          align: "center",
           dataIndex: "address"
         },
         {
           title: "操作",
           dataIndex: "address1",
+          align: "center",
           scopedSlots: { customRender: "action" }
         }
       ],

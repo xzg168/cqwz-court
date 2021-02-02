@@ -10,7 +10,7 @@
         <a-form-item>
           <a-input
             v-decorator="[
-              'userName',
+              'account',
               {
                 rules: [{ required: true, message: '请输入用户名!' }]
               }
@@ -69,9 +69,14 @@ export default {
       this.form.validateFields((err, values) => {
         if (!err) {
           console.log("Received values of form: ", values);
-          this.$http.post("/login", values);
+          this.$http.post("/admin/login", values).then(res => {
+            if (res.code === 0) {
+              this.$store.dispatch("setUserInfo", res.data);
+            } else {
+              this.$message.erro(res.message);
+            }
+          });
           window.sessionStorage.setItem("token", "123");
-          this.$store.dispatch("setUserInfo", values);
           this.$router.push("/");
         }
       });
