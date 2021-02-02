@@ -369,6 +369,7 @@ export default {
     // 改变案件状态
     changeCaseType(type) {
       console.log("type", type);
+      this.getData();
     },
     // 显示分页pageSize
     onShowSizeChange(current, pageSize) {

@@ -67,6 +67,7 @@
     <div :style="{ textAlign: 'right', padding: '20px 0' }">
       <a-pagination
         show-quick-jumper
+        show-size-changer
         :default-current="1"
         :total="500"
         @change="onPagChange"

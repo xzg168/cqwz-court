@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Notification, Message } from "ant-design-vue";
+import { notification, message, Modal } from "ant-design-vue";
 import store from "@/store";
 import { getToken } from "@/utils/auth";
 
@@ -31,22 +31,21 @@ service.interceptors.response.use(
   res => {
     const code = res.data.code;
     if (code === 401) {
-      // MessageBox.confirm(
-      //   "登录状态已过期，您可以继续留在该页面，或者重新登录",
-      //   "系统提示",
-      //   {
-      //     confirmButtonText: "重新登录",
-      //     cancelButtonText: "取消",
-      //     type: "warning"
-      //   }
-      // ).then(() => {
-      //   store.dispatch("LogOut").then(() => {
-      //     location.reload(); // 为了重新实例化vue-router对象 避免bug
-      //   });
-      // });
+      Modal.error({
+        title: "登录已过期",
+        content: "很抱歉，登录已过期，请重新登录",
+        okText: "重新登录",
+        mask: false,
+        onOk: () => {
+          window.sessionStorage.removeItem("token");
+          window.location.reload();
+        }
+      });
     } else if (code !== 200) {
-      Notification.error({
-        title: res.data.msg
+      notification.error({
+        message: "系统提示",
+        description: res.data.msg,
+        duration: 4
       });
       return Promise.reject("error");
     } else {
@@ -55,11 +54,9 @@ service.interceptors.response.use(
   },
   error => {
     console.log("err" + error);
-    // Message({
-    //   message: error.message,
-    //   type: "error",
-    //   duration: 5 * 1000
-    // });
+    message.error({
+      content: error
+    });
     return Promise.reject(error);
   }
 );
