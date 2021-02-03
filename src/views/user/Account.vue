@@ -41,7 +41,7 @@
     >
       <template slot="title">
         <a-row>
-          <a-col :span="12">数据列表</a-col>
+          <a-col :span="12"><a-icon type="database" />数据列表</a-col>
           <a-col :span="12" :style="{ textAlign: 'right' }" class="tableBtn">
             <a-button type="primary" @click="handleAdd">
               添加
@@ -85,6 +85,7 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
+import moment from "moment";
 import AddModal from "./modal/AddModal";
 const data = [
   {
@@ -146,7 +147,10 @@ export default {
         {
           title: "添加时间",
           dataIndex: "create_time",
-          align: "center"
+          align: "center",
+          customRender: text => {
+            return moment(text).format("YYYY-MM-DD");
+          }
         },
         {
           title: "是否启用",

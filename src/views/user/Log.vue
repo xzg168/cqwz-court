@@ -14,7 +14,7 @@
             >
               <a-input
                 placeholder="请输入操作人员"
-                v-model="queryParam.roleName"
+                v-model="queryParam.account"
               ></a-input>
             </a-form-item>
           </a-col>
@@ -24,11 +24,12 @@
               :labelCol="{ span: 6 }"
               :wrapperCol="{ span: 17, offset: 1 }"
             >
-              <a-date-picker
+              <!-- <a-date-picker
                 placeholder="请选择操作日期"
                 v-model="queryParam.caseno"
                 valueFormat="YYYY-MM-DD"
-              />
+              /> -->
+              <a-range-picker v-model="queryParam.dateRang" valueFormat="x" />
             </a-form-item>
           </a-col>
 
@@ -53,12 +54,12 @@
       rowKey="id"
       :pagination="false"
     >
-      <template slot="name" slot-scope="text">
+      <!-- <template slot="name" slot-scope="text">
         <a>{{ text }}</a>
-      </template>
+      </template> -->
       <template slot="title">
         <a-row>
-          <a-col :span="12">数据列表</a-col>
+          <a-col :span="12"><a-icon type="database" />数据列表</a-col>
           <a-col :span="12" :style="{ textAlign: 'right' }" class="tableBtn">
           </a-col>
         </a-row>
@@ -69,8 +70,11 @@
         show-quick-jumper
         show-size-changer
         :default-current="1"
-        :total="500"
+        :total="total"
         @change="onPagChange"
+        v-model="queryParam.pageNum"
+        @showSizeChange="onShowSizeChange"
+        :page-size.sync="queryParam.pageSize"
       />
     </div>
   </div>
@@ -81,25 +85,25 @@
 //例如：import 《组件名称》 from '《组件路径》';
 const data = [
   {
-    key: "1",
-    name: "John Brown",
-    money: "￥300,000.00",
-    address: "New York No. 1 Lake Park"
+    id: "1",
+    account: "John Brown",
+    create_time: 1612257868292,
+    operation_content: "New York No. 1 Lake Park"
   },
   {
-    key: "2",
-    name: "Jim Green",
-    money: "￥1,256,000.00",
-    address: "London No. 1 Lake Park"
+    id: "2",
+    account: "John Brown",
+    create_time: 1612257868292,
+    operation_content: "New York No. 1 Lake Park"
   },
   {
-    key: "3",
-    name: "Joe Black",
-    money: "￥120,000.00",
-    address: "Sidney No. 1 Lake Park"
+    id: "3",
+    account: "John Brown",
+    create_time: 1612257868292,
+    operation_content: "New York No. 1 Lake Park"
   }
 ];
-
+import moment from "moment";
 export default {
   props: {},
   //import引入的组件需要注入到对象中才能使用
@@ -107,8 +111,12 @@ export default {
   data() {
     //这里存放数据
     return {
+      total: 0,
       queryParam: {
-        caseType: "a"
+        dateRang: [],
+        account: "",
+        pageNum: 1,
+        pageSize: 20
       },
       data,
       columns: [
@@ -120,15 +128,17 @@ export default {
         },
         {
           title: "操作者",
-          dataIndex: "name",
+          dataIndex: "account",
           align: "center",
           scopedSlots: { customRender: "name" }
         },
         {
           title: "操作日期",
           align: "center",
-          className: "column-money",
-          dataIndex: "money"
+          dataIndex: "create_time",
+          customRender: text => {
+            return moment(text).format("YYYY-MM-DD");
+          }
         },
         {
           title: "IP地址",
@@ -138,7 +148,7 @@ export default {
         {
           title: "操作记录",
           align: "center",
-          dataIndex: "address1"
+          dataIndex: "operation_content"
         }
       ],
       loading: false
@@ -150,14 +160,52 @@ export default {
   watch: {},
   //方法集合
   methods: {
-    searchQuery() {},
-    searchReset() {},
+    // 获取列表数据
+    getData() {
+      console.log(this.queryParam.dateRang);
+      if (this.queryParam.dateRang.length > 0) {
+        // moment 转时间戳
+        // this.queryParam.start_time = this.queryParam.dateRang[0].valueOf();
+        // this.queryParam.end_time = this.queryParam.dateRang[1].valueOf();
+        // 日期插件转时间戳
+        this.queryParam.start_time = this.queryParam.dateRang[0];
+        this.queryParam.end_time = this.queryParam.dateRang[1];
+        delete this.queryParam.dateRang;
+      }
+      let params = JSON.parse(JSON.stringify(this.queryParam));
+      this.$http.get("/operation/log/list", { params: params }).then(res => {
+        if (res.code === 200) {
+          this.total = res.data.total;
+          this.data = res.data.list;
+        }
+      });
+    },
+    // 查询
+    searchQuery() {
+      this.getData();
+    },
+    // 重置
+    searchReset() {
+      this.queryParam = { dateRang: [], account: "", pageNum: 1, pageSize: 20 };
+      this.getData();
+    },
+    // 显示分页pageSize
+    onShowSizeChange(current, pageSize) {
+      console.log(current, pageSize);
+      this.queryParam.pageNum = current;
+      this.queryParam.pageSize = pageSize;
+      this.getData();
+    },
+    // 分页跳转
     onPagChange(pageNumber) {
-      console.log("Page: ", pageNumber);
+      // this.queryParam.current = pageNumber;
+      this.getData();
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
+  created() {
+    this.getData();
+  },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
   beforeCreate() {}, //生命周期 - 创建之前

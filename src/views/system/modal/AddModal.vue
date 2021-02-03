@@ -19,7 +19,7 @@
         >
           <a-input
             style="width: 100%"
-            v-decorator="['pName', validatorRules.pName]"
+            v-decorator="['product_name', validatorRules.product_name]"
           >
           </a-input>
         </a-form-item>
@@ -31,7 +31,7 @@
           <a-select
             default-value="lucy"
             style="width: 100%"
-            v-decorator="['gName', validatorRules.gName]"
+            v-decorator="['document_ids', validatorRules.gName]"
           >
             <a-select-option value="jack">
               Jack
@@ -52,10 +52,10 @@
           :wrapperCol="wrapperCol"
           label="是否启用"
         >
-          <a-switch v-decorator="['ststus']" />
+          <a-switch v-decorator="['is_type', { valuePropName: 'checked' }]" />
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="描述">
-          <a-textarea v-decorator="['des']" />
+          <a-textarea v-decorator="['product_describe']" />
         </a-form-item>
       </a-form>
     </a-spin>
@@ -84,24 +84,13 @@ export default {
       confirmLoading: false,
       form: this.$form.createForm(this),
       validatorRules: {
-        pName: {
+        product_name: {
           rules: [
             { required: true, message: "请输入产品名称!" },
             {
               min: 2,
               max: 30,
               message: "长度在 2 到 30 个字符",
-              trigger: "blur"
-            }
-          ]
-        },
-        roleCode: {
-          rules: [
-            { required: true, message: "请输入角色编码!" },
-            {
-              min: 0,
-              max: 64,
-              message: "长度不超过 64 个字符",
               trigger: "blur"
             }
           ]
@@ -113,24 +102,31 @@ export default {
   methods: {
     add() {
       this.edit({});
+      this.title = "添加产品";
     },
     edit(record) {
+      console.log(record, "嘻嘻嘻嘻嘻嘻寻");
       this.form.resetFields();
+      if (record.is_type === 1) {
+        record.is_type = "checked";
+      } else {
+        record.is_type = false;
+      }
       this.model = Object.assign({}, record);
       this.visible = true;
       this.title = "编辑产品";
       //编辑页面禁止修改角色编码
       if (this.model.id) {
         this.roleDisabled = true;
+        this.$nextTick(() => {
+          this.form.setFieldsValue(this.model);
+        });
       } else {
         this.roleDisabled = false;
+        this.$nextTick(() => {
+          this.form.setFieldsValue({ is_type: "checked" });
+        });
       }
-      this.$nextTick(() => {
-        this.form
-          .setFieldsValue
-          //   pick(this.model, "roleName", "description", "roleCode")
-          ();
-      });
     },
     close() {
       this.$emit("close");
@@ -143,8 +139,29 @@ export default {
         if (!err) {
           that.confirmLoading = true;
           let formData = Object.assign(this.model, values);
-          let obj;
+          if (formData.is_type) {
+            formData.is_type = 1;
+          } else {
+            formData.is_type = 2;
+          }
           console.log(formData);
+          if (this.roleDisabled) {
+            this.$http.post("/product/update", { ...formData }).then(res => {
+              if (res.code === 200) {
+                this.$message.success(res.message);
+                this.visible = false;
+                this.$emit("ok");
+              }
+            });
+          } else {
+            this.$http.post("/product/add", { ...formData }).then(res => {
+              if (res.code === 200) {
+                this.$message.success(res.message);
+                this.visible = false;
+                this.$emit("ok");
+              }
+            });
+          }
         }
       });
     },

@@ -107,7 +107,9 @@ export default {
       reloading: false
     };
   },
-  mounted() {},
+  mounted() {
+    this.reload();
+  },
   methods: {
     reload() {
       this.reloading = true;

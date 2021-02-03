@@ -95,6 +95,7 @@
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
 import SettingModal from "./modal/SettingModal";
+import { removeToken } from "@/utils/auth";
 export default {
   props: {},
   //import引入的组件需要注入到对象中才能使用
@@ -136,10 +137,13 @@ export default {
     },
     loginOut() {
       window.sessionStorage.removeItem("token");
+      removeToken();
       this.$store.dispatch("setUserInfo", {});
       this.$router.push("/login");
     },
     handleChangeInfo() {
+      const userInfo = this.$store.getters.getUserFn;
+      console.log("userInfo".userInfo);
       this.$refs.setRef.edit();
     }
   },

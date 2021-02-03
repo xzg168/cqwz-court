@@ -57,7 +57,7 @@
       </template>
       <template slot="title">
         <a-row>
-          <a-col :span="12">数据列表</a-col>
+          <a-col :span="12"><a-icon type="database" />数据列表</a-col>
           <a-col :span="12" :style="{ textAlign: 'right' }" class="tableBtn">
             <a-button @click="handleAddWs">添加</a-button>
           </a-col>
@@ -68,17 +68,29 @@
           <a href="javascript:;" @click="handleEdit(text)">编辑</a>
         </div>
       </template>
+      <template slot="useStatus" slot-scope="text, record">
+        <div>
+          <a-switch
+            checked-children="ON"
+            un-checked-children="OFF"
+            :defaultChecked="text === 1 ? true : false"
+            @change="e => changeStatus(e, record)"
+          />
+        </div>
+      </template>
     </a-table>
     <div :style="{ textAlign: 'right', padding: '20px 0' }">
       <a-pagination
         show-quick-jumper
         show-size-changer
-        :default-current="1"
-        :total="500"
+        :total="total"
         @change="onPagChange"
+        v-model="queryParam.pageNum"
+        @showSizeChange="onShowSizeChange"
+        :page-size.sync="queryParam.pageSize"
       />
     </div>
-    <AddWsModal ref="wsRef" />
+    <AddWsModal ref="wsRef" @ok="getData" />
   </div>
 </template>
 
@@ -87,22 +99,23 @@
 //例如：import 《组件名称》 from '《组件路径》';
 const data = [
   {
-    key: "1",
-    name: "John Brown",
-    money: "￥300,000.00",
-    address: "New York No. 1 Lake Park"
+    id: "1",
+    document_name: "John Brown",
+    document_describe: "￥300,000.00",
+    is_type: 2,
+    document_content: "<p>123456</p>"
   },
   {
-    key: "2",
-    name: "Jim Green",
-    money: "￥1,256,000.00",
-    address: "London No. 1 Lake Park"
+    id: "2",
+    document_name: "Jim Green",
+    document_describe: "￥1,256,000.00",
+    is_type: 1
   },
   {
-    key: "3",
-    name: "Joe Black",
-    money: "￥120,000.00",
-    address: "Sidney No. 1 Lake Park"
+    id: "3",
+    document_name: "Joe Black",
+    document_describe: "￥120,000.00",
+    is_type: 1
   }
 ];
 import AddWsModal from "./modal/AddWsModal";
@@ -113,8 +126,10 @@ export default {
   data() {
     //这里存放数据
     return {
+      total: 0,
       queryParam: {
-        caseType: "a"
+        pageNum: 1,
+        pageSize: 20
       },
       data,
       columns: [
@@ -126,24 +141,22 @@ export default {
         },
         {
           title: "文书名称",
-          dataIndex: "name",
-          align: "center",
-          scopedSlots: { customRender: "name" }
+          dataIndex: "document_name",
+          align: "center"
         },
         {
           title: "文书描述",
           align: "center",
-          className: "column-money",
-          dataIndex: "money"
+          dataIndex: "document_describe"
         },
         {
           title: "状态",
           align: "center",
-          dataIndex: "address"
+          dataIndex: "is_type",
+          scopedSlots: { customRender: "useStatus" }
         },
         {
           title: "操作",
-          dataIndex: "address1",
           align: "center",
           scopedSlots: { customRender: "action" }
         }
@@ -157,13 +170,52 @@ export default {
   watch: {},
   //方法集合
   methods: {
+    // 获取列表项
+    getData() {
+      let params = JSON.parse(JSON.stringify(this.queryParam));
+      this.$http
+        .get("/document/maintain/list", { params: params })
+        .then(res => {
+          if (res.code === 200) {
+            this.total = res.data.total;
+            this.data = res.data.list;
+          }
+        });
+    },
     // 查询
-    searchQuery() {},
+    searchQuery() {
+      this.getData();
+    },
     // 重置
-    searchReset() {},
-    // 页数改变
+    searchReset() {
+      this.queryParam = {
+        pageNum: 1,
+        pageSize: 20
+      };
+      this.getData();
+    },
+    // 显示分页pageSize
+    onShowSizeChange(current, pageSize) {
+      console.log(current, pageSize);
+      this.queryParam.pageNum = current;
+      this.queryParam.pageSize = pageSize;
+      this.getData();
+    },
+    // 分页跳转
     onPagChange(pageNumber) {
-      console.log("Page: ", pageNumber);
+      // this.queryParam.current = pageNumber;
+      this.getData();
+    },
+    // 改变状态
+    changeStatus(checked, record) {
+      console.log("checked", checked, record);
+      this.$http
+        .post("/document/maintain/updateTypeById", { id: record.id })
+        .then(res => {
+          if (res.code === 200) {
+            this.$message.success(res.message);
+          }
+        });
     },
     // 添加
     handleAddWs() {
@@ -175,7 +227,9 @@ export default {
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
+  created() {
+    this.getData();
+  },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
   beforeCreate() {}, //生命周期 - 创建之前

@@ -12,19 +12,22 @@
   >
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="账号"
-          extra="默认密码为“123456”，登录后可修改密码"
-        >
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="账号">
           <a-input
             v-decorator="['account', validatorRules.account]"
             :disabled="isDisabled"
           >
           </a-input>
         </a-form-item>
-
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="密码"
+          extra="默认密码为“123456”，登录后可修改密码"
+        >
+          <a-input v-decorator="['password', { initialValue: 123456 }]">
+          </a-input>
+        </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
@@ -119,13 +122,23 @@ export default {
           that.confirmLoading = true;
           let formData = Object.assign(this.model, values);
           console.log(formData);
-          this.$http.post("/admin/update", { ...formData }).then(res => {
-            if (res.code === 200) {
-              this.confirmLoading = false;
-              this.visible = false;
-              this.$emit("ok");
-            }
-          });
+          if (this.isDisabled) {
+            this.$http.post("/admin/update", { ...formData }).then(res => {
+              if (res.code === 200) {
+                this.confirmLoading = false;
+                this.visible = false;
+                this.$emit("ok");
+              }
+            });
+          } else {
+            this.$http.post("/admin/add", { ...formData }).then(res => {
+              if (res.code === 200) {
+                this.confirmLoading = false;
+                this.visible = false;
+                this.$emit("ok");
+              }
+            });
+          }
         }
       });
     },

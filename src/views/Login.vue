@@ -47,7 +47,7 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-
+import { setToken } from "@/utils/auth";
 export default {
   props: {},
   //import引入的组件需要注入到对象中才能使用
@@ -72,12 +72,14 @@ export default {
           this.$http.post("/admin/login", values).then(res => {
             if (res.code === 0) {
               this.$store.dispatch("setUserInfo", res.data);
+              setToken(res.data.id);
             } else {
               this.$message.erro(res.message);
             }
           });
           window.sessionStorage.setItem("token", "123");
           this.$router.push("/");
+          setToken("123");
         }
       });
     }

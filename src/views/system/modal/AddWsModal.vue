@@ -19,7 +19,7 @@
         >
           <a-input
             style="width: 100%"
-            v-decorator="['pName', validatorRules.pName]"
+            v-decorator="['document_name', validatorRules.document_name]"
           >
           </a-input>
         </a-form-item>
@@ -28,19 +28,23 @@
           :wrapperCol="wrapperCol"
           label="文书描述"
         >
-          <!-- <a-textarea
-            style="width: 100%"
-            v-decorator="['gName', validatorRules.gName]"
-          >
-          </a-textarea> -->
-          <JEditor v-decorator="['des']" isTemplate />
+          <a-textarea style="width: 100%" v-decorator="['document_describe']">
+          </a-textarea>
+        </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="文书内容"
+        >
+          <JEditor
+            v-decorator="['document_content']"
+            isTemplate
+            triggerChange
+          />
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="状态">
-          <a-switch v-decorator="['ststus']" />
+          <a-switch v-decorator="['is_type', { valuePropName: 'checked' }]" />
         </a-form-item>
-        <!-- <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="模板">
-          <JEditor v-decorator="['des']" isTemplate />
-        </a-form-item> -->
       </a-form>
     </a-spin>
   </a-modal>
@@ -69,24 +73,13 @@ export default {
       confirmLoading: false,
       form: this.$form.createForm(this),
       validatorRules: {
-        pName: {
+        document_name: {
           rules: [
-            { required: true, message: "请输入产品名称!" },
+            { required: true, message: "请输入文书名称!" },
             {
               min: 2,
               max: 30,
               message: "长度在 2 到 30 个字符",
-              trigger: "blur"
-            }
-          ]
-        },
-        roleCode: {
-          rules: [
-            { required: true, message: "请输入角色编码!" },
-            {
-              min: 0,
-              max: 64,
-              message: "长度不超过 64 个字符",
               trigger: "blur"
             }
           ]
@@ -102,21 +95,27 @@ export default {
     },
     edit(record) {
       this.form.resetFields();
+      if (record.is_type === 1) {
+        record.is_type = "checked";
+      } else {
+        record.is_type = false;
+      }
       this.model = Object.assign({}, record);
       this.visible = true;
       this.title = "编辑文书";
+      this.confirmLoading = false;
       //编辑页面禁止修改角色编码
-      // if (this.model.id) {
-      //   this.roleDisabled = true;
-      // } else {
-      //   this.roleDisabled = false;
-      // }
-      this.$nextTick(() => {
-        this.form
-          .setFieldsValue
-          //   pick(this.model, "roleName", "description", "roleCode")
-          ();
-      });
+      if (this.model.id) {
+        this.roleDisabled = true;
+        this.$nextTick(() => {
+          this.form.setFieldsValue(this.model);
+        });
+      } else {
+        this.roleDisabled = false;
+        this.$nextTick(() => {
+          this.form.setFieldsValue({ is_type: "checked" });
+        });
+      }
     },
     close() {
       this.$emit("close");
@@ -129,8 +128,33 @@ export default {
         if (!err) {
           that.confirmLoading = true;
           let formData = Object.assign(this.model, values);
-          let obj;
+          if (formData.is_type) {
+            formData.is_type = 1;
+          } else {
+            formData.is_type = 2;
+          }
           console.log(formData);
+          if (this.roleDisabled) {
+            this.$http
+              .post("/document/maintain/update", { ...formData })
+              .then(res => {
+                if (res.code === 200) {
+                  this.$message.success(res.message);
+                  this.visible = false;
+                  this.$emit("ok");
+                }
+              });
+          } else {
+            this.$http
+              .post("/document/maintain/add", { ...formData })
+              .then(res => {
+                if (res.code === 200) {
+                  this.$message.success(res.message);
+                  this.visible = false;
+                  this.$emit("ok");
+                }
+              });
+          }
         }
       });
     },

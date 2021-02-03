@@ -14,7 +14,7 @@
             >
               <a-input
                 placeholder="请输入用户姓名"
-                v-model="queryParam.roleName"
+                v-model="queryParam.pName"
               ></a-input>
             </a-form-item>
           </a-col>
@@ -45,7 +45,7 @@
       </template>
       <template slot="title">
         <a-row>
-          <a-col :span="12">数据列表</a-col>
+          <a-col :span="12"><a-icon type="database" />数据列表</a-col>
           <a-col :span="12" :style="{ textAlign: 'right' }" class="tableBtn">
             <a-button type="primary" @click="handleAdd">
               添加
@@ -55,14 +55,19 @@
       </template>
       <template slot="action" slot-scope="text">
         <div>
-          <a href="javascript:;" @click="handleEdit">编辑</a>
+          <a href="javascript:;" @click="handleEdit(text)">编辑</a>
           <a-divider type="vertical" />
-          <a href="javascript:;">删除</a>
+          <a href="javascript:;" @click="handleRemove(text)">删除</a>
         </div>
       </template>
-      <template slot="useStatus">
+      <template slot="useStatus" slot-scope="text, record">
         <div>
-          <a-switch checked-children="ON" un-checked-children="OFF" />
+          <a-switch
+            checked-children="ON"
+            un-checked-children="OFF"
+            :defaultChecked="text === 1 ? true : false"
+            @change="e => changeStatus(e, record)"
+          />
         </div>
       </template>
     </a-table>
@@ -71,35 +76,42 @@
         show-quick-jumper
         show-size-changer
         :default-current="1"
-        :total="500"
+        :total="total"
         @change="onPagChange"
+        v-model="queryParam.pageNum"
+        @showSizeChange="onShowSizeChange"
+        :page-size.sync="queryParam.pageSize"
       />
     </div>
-    <AddModal ref="addRef" />
+    <AddModal ref="addRef" @ok="getData" />
   </div>
 </template>
 
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
+import moment from "moment";
 import AddModal from "./modal/AddModal";
 const data = [
   {
-    key: "1",
+    id: "1",
     name: "John Brown",
     money: "￥300,000.00",
-    address: "New York No. 1 Lake Park"
+    address: "New York No. 1 Lake Park",
+    is_type: 1
   },
   {
-    key: "2",
+    id: "2",
     name: "Jim Green",
     money: "￥1,256,000.00",
+    is_type: 2,
     address: "London No. 1 Lake Park"
   },
   {
-    key: "3",
+    id: "3",
     name: "Joe Black",
     money: "￥120,000.00",
+    is_type: 1,
     address: "Sidney No. 1 Lake Park"
   }
 ];
@@ -111,8 +123,10 @@ export default {
   data() {
     //这里存放数据
     return {
+      total: 0,
       queryParam: {
-        caseType: "a"
+        pageNum: 1,
+        pageSize: 20
       },
       data,
       columns: [
@@ -142,17 +156,19 @@ export default {
         {
           title: "是否启用",
           align: "center",
-          dataIndex: "address1",
+          dataIndex: "is_type",
           scopedSlots: { customRender: "useStatus" }
         },
         {
           title: "创建时间",
           align: "center",
-          dataIndex: "address2"
+          dataIndex: "create_time",
+          customRender: text => {
+            return moment(text).format("YYYY-MM-DD");
+          }
         },
         {
           title: "操作",
-          dataIndex: "address12",
           align: "center",
           fixed: "right",
           scopedSlots: { customRender: "action" }
@@ -167,20 +183,69 @@ export default {
   watch: {},
   //方法集合
   methods: {
-    searchQuery() {},
-    searchReset() {},
+    // 获取列表项
+    getData() {
+      let params = JSON.parse(JSON.stringify(this.queryParam));
+      this.$http.get("/admin/list", { params: params }).then(res => {
+        if (res.code === 200) {
+          this.total = res.data.total;
+          this.data = res.data.list;
+        }
+      });
+    },
+    searchQuery() {
+      this.getData();
+    },
+    searchReset() {
+      this.queryParam = {
+        pageNum: 1,
+        pageSize: 20,
+        pName: ""
+      };
+      this.getData();
+    },
+    // 显示分页pageSize
+    onShowSizeChange(current, pageSize) {
+      console.log(current, pageSize);
+      this.queryParam.pageNum = current;
+      this.queryParam.pageSize = pageSize;
+      this.getData();
+    },
+    // 分页跳转
     onPagChange(pageNumber) {
-      console.log("Page: ", pageNumber);
+      // this.queryParam.current = pageNumber;
+      this.getData();
+    },
+    // 改变状态
+    changeStatus(checked, record) {
+      console.log("checked", checked, record);
+      this.$http
+        .post("/document/maintain/updateTypeById", { id: record.id })
+        .then(res => {
+          if (res.code === 200) {
+            this.$message.success(res.message);
+          }
+        });
     },
     handleAdd() {
       this.$refs.addRef.add();
     },
     handleEdit(text) {
       this.$refs.addRef.edit(text);
+    },
+    handleRemove(record) {
+      this.$http.post("/admin/fakeDelete", { id: record.id }).then(res => {
+        if (res.code === 200) {
+          this.$message.success(res.message);
+          this.getData();
+        }
+      });
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
+  created() {
+    this.getData();
+  },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
   beforeCreate() {}, //生命周期 - 创建之前
