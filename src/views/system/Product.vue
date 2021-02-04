@@ -14,7 +14,7 @@
             >
               <a-input
                 placeholder="请输入用户姓名"
-                v-model="queryParam.pName"
+                v-model="queryParam.product_name"
               ></a-input>
             </a-form-item>
           </a-col>
@@ -40,9 +40,6 @@
       rowKey="id"
       :pagination="false"
     >
-      <template slot="name" slot-scope="text">
-        <a>{{ text }}</a>
-      </template>
       <template slot="title">
         <a-row>
           <a-col :span="12"><a-icon type="database" />数据列表</a-col>
@@ -57,7 +54,15 @@
         <div>
           <a href="javascript:;" @click="handleEdit(text)">编辑</a>
           <a-divider type="vertical" />
-          <a href="javascript:;" @click="handleRemove(text)">删除</a>
+          <a-popconfirm
+            title="确认删除这条数据?"
+            placement="topRight"
+            ok-text="是"
+            cancel-text="否"
+            @confirm="handleRemove(text)"
+          >
+            <a href="javascript:;">删除</a>
+          </a-popconfirm>
         </div>
       </template>
       <template slot="useStatus" slot-scope="text, record">
@@ -95,24 +100,27 @@ import AddModal from "./modal/AddModal";
 const data = [
   {
     id: "1",
-    name: "John Brown",
-    money: "￥300,000.00",
-    address: "New York No. 1 Lake Park",
-    is_type: 1
+    product_name: "John Brown",
+    document_name: "￥300,000.00",
+    product_describe: "New York No. 1 Lake Park",
+    is_type: 1,
+    create_time: 1612421493292
   },
   {
     id: "2",
-    name: "Jim Green",
-    money: "￥1,256,000.00",
+    product_name: "Jim Green",
+    document_name: "￥1,256,000.00",
     is_type: 2,
-    address: "London No. 1 Lake Park"
+    product_describe: "London No. 1 Lake Park",
+    create_time: 1612421493292
   },
   {
     id: "3",
-    name: "Joe Black",
-    money: "￥120,000.00",
+    product_name: "Joe Black",
+    document_name: "￥120,000.00",
     is_type: 1,
-    address: "Sidney No. 1 Lake Park"
+    product_describe: "Sidney No. 1 Lake Park",
+    create_time: 1612421493292
   }
 ];
 
@@ -125,6 +133,7 @@ export default {
     return {
       total: 0,
       queryParam: {
+        product_name: "",
         pageNum: 1,
         pageSize: 20
       },
@@ -138,19 +147,17 @@ export default {
         },
         {
           title: "产品名称",
-          dataIndex: "name",
-          align: "center",
-          scopedSlots: { customRender: "name" }
+          dataIndex: "product_name",
+          align: "center"
         },
         {
           title: "描述",
-          className: "column-money",
           align: "center",
-          dataIndex: "money"
+          dataIndex: "product_describe"
         },
         {
           title: "文书名称",
-          dataIndex: "address",
+          dataIndex: "document_name",
           align: "center"
         },
         {
@@ -170,7 +177,6 @@ export default {
         {
           title: "操作",
           align: "center",
-          fixed: "right",
           scopedSlots: { customRender: "action" }
         }
       ],
@@ -186,7 +192,7 @@ export default {
     // 获取列表项
     getData() {
       let params = JSON.parse(JSON.stringify(this.queryParam));
-      this.$http.get("/admin/list", { params: params }).then(res => {
+      this.$http.get("/product/list", { params: params }).then(res => {
         if (res.code === 200) {
           this.total = res.data.total;
           this.data = res.data.list;
@@ -200,7 +206,7 @@ export default {
       this.queryParam = {
         pageNum: 1,
         pageSize: 20,
-        pName: ""
+        product_name: ""
       };
       this.getData();
     },
@@ -234,7 +240,7 @@ export default {
       this.$refs.addRef.edit(text);
     },
     handleRemove(record) {
-      this.$http.post("/admin/fakeDelete", { id: record.id }).then(res => {
+      this.$http.post("/product/fakeDelete", { id: record.id }).then(res => {
         if (res.code === 200) {
           this.$message.success(res.message);
           this.getData();

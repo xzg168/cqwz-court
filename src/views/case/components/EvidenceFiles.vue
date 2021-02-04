@@ -21,14 +21,7 @@
               <span class="btnContainer">
                 <!-- <a @click="handlePreview(fileItem)">预览</a>
               <span>|</span> -->
-                <!-- <a
-                  @click="
-                    downloadFile(fileItem.filePath, fileItem.fileName, {
-                      id: fileItem.id
-                    })
-                  "
-                  >下载</a
-                > -->
+                <a @click="downloadFile">下载</a>
               </span>
             </div>
           </a-col>
@@ -45,7 +38,6 @@
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》';
 import { SectionToChinese } from "@/utils/util";
-// import { downloadFile } from '@/api/manage'
 export default {
   // import引入的组件需要注入到对象中才能使用
   components: {},
@@ -67,17 +59,8 @@ export default {
   // 方法集合
   methods: {
     SectionToChinese,
-    // downloadFile,
-    handlePreview(record) {
-      if (record) {
-        record.url = `${window._CONFIG["domianURL"]}/${record.filePath}?id=${record.id}}`;
-        let url =
-          window._CONFIG["onlinePreviewDomainURL"] +
-          "?url=" +
-          encodeURIComponent(record.url);
-        window.open(url, "_blank");
-      }
-    }
+    // 下载附件
+    downloadFile() {}
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
   created() {},

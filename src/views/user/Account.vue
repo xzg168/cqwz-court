@@ -53,7 +53,15 @@
         <div>
           <a href="javascript:;" @click="handleEdit(text)">编辑</a>
           <a-divider type="vertical" />
-          <a href="javascript:;" @click="handleRemove(text)">删除</a>
+          <a-popconfirm
+            title="确认删除这条数据?"
+            placement="topRight"
+            ok-text="是"
+            cancel-text="否"
+            @confirm="handleRemove(text)"
+          >
+            <a href="javascript:;">删除</a>
+          </a-popconfirm>
         </div>
       </template>
       <template slot="useStatus" slot-scope="text, record">

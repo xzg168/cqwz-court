@@ -12,17 +12,10 @@
         :dataSource="docData"
         :pagination="false"
       >
-        <!-- <template slot="htmlSlot" slot-scope="text">
-          <div v-html="text"></div>
-        </template>
-        <template slot="imgSlot" slot-scope="text">
-          <span v-if="!text" style="font-size: 12px;font-style: italic;">无图片</span>
-          <img v-else :src="getImgView(text)" height="25px" alt="" style="max-width:80px;font-size: 12px;font-style: italic;"/>
-        </template>-->
         <template slot="uploadList" slot-scope="file, row, index">
-          <a @click="downloadFileById(row.id)"
-            ><a-icon type="paper-clip" />{{ row.fileName }}</a
-          >
+          <a @click="downloadFileById(row.id)">
+            <a-icon type="paper-clip" />{{ row.fileName }}
+          </a>
         </template>
       </a-table>
     </div>
@@ -32,8 +25,6 @@
 <script>
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》';
-// import { getAction, downloadFile, deleteAction, putAction, postAction, httpAction } from '@/api/manage'
-// import { filterDictTextByCache } from '@/components/dict/JDictSelectUtil'
 export default {
   // import引入的组件需要注入到对象中才能使用
   components: {},
@@ -83,10 +74,9 @@ export default {
   watch: {},
   // 方法集合
   methods: {
-    // filterDictTextByCache,
-    // downloadFile,
+    // 获取案件文书
     getInfo(id) {
-      // getAction('ajjbxx/spAjjbxx/queryDocByAjId', { id: id }).then((res) => {
+      // this.$http.get('ajjbxx/spAjjbxx/queryDocByAjId', { params:{id: id} }).then((res) => {
       //   console.log('文书res', res)
       //   this.docData = res.result
       // })

@@ -2,6 +2,7 @@
 <template>
   <div class="niceBorder">
     <div v-if="item.dsrlx === '1'">
+      <!-- 自然人 -->
       <a-descriptions class="verticallyCentered" title="" size="small">
         <a-descriptions-item label="姓名">
           {{ item.dsrmc }}
@@ -12,10 +13,10 @@
         <a-descriptions-item label="民族">
           <!-- {{ filterDictTextByCache('mz',item.mz) }} -->
         </a-descriptions-item>
-        <a-descriptions-item label="证件类型 ">
-          <!-- {{ filterDictTextByCache('zjzl',item.zjzl) }} -->
+        <a-descriptions-item label="见证类别 ">
+          自然人
         </a-descriptions-item>
-        <a-descriptions-item label="证件号">
+        <a-descriptions-item label="身份证">
           {{ item.zjhm }}
         </a-descriptions-item>
         <a-descriptions-item label="出生年月">
@@ -27,12 +28,15 @@
         <a-descriptions-item label="邮箱">
           {{ item.lxyx }}
         </a-descriptions-item>
-        <a-descriptions-item label="居住地址">
+        <a-descriptions-item label="邮编">
+          {{ item.lxyx }}
+        </a-descriptions-item>
+        <!-- <a-descriptions-item label="居住地址">
           {{ item.zsdz }}
         </a-descriptions-item>
         <a-descriptions-item label="送达地址 " :span="3">
           {{ item.sddz }}
-        </a-descriptions-item>
+        </a-descriptions-item> -->
         <a-descriptions-item label="证件资料" :span="3">
           <div
             class="certificateContainer"
@@ -61,6 +65,7 @@
       </a-descriptions>
     </div>
     <div v-else>
+      <!-- 法人 -->
       <a-descriptions class="verticallyCentered" title="" size="small">
         <a-descriptions-item label="企业名称">
           {{ item.dsrmc }}
@@ -75,21 +80,21 @@
           <!-- {{ filterDictTextByCache('zjzl',item.zjzl) }}
            -->
         </a-descriptions-item>
-        <a-descriptions-item label="法人证件号">
+        <a-descriptions-item label="代表人身份证号">
           {{ item.zjhm }}
         </a-descriptions-item>
         <a-descriptions-item label="注册地址">
           {{ item.zsdz }}
         </a-descriptions-item>
-        <a-descriptions-item label="送达地址">
+        <a-descriptions-item label="约定送达地址">
           {{ item.sddz }}
         </a-descriptions-item>
-        <a-descriptions-item label="联系电话">
+        <a-descriptions-item label="联系电话" :span="2">
           {{ item.lxdh }}
         </a-descriptions-item>
-        <a-descriptions-item label="联系人邮箱">
+        <!-- <a-descriptions-item label="联系人邮箱">
           {{ item.lxyx }}
-        </a-descriptions-item>
+        </a-descriptions-item> -->
         <a-descriptions-item label="证件资料" :span="3">
           <a-col
             class="certificateContainer"
@@ -117,49 +122,12 @@
         >
       </a-descriptions>
     </div>
-    <!-- <div v-if="!isBg && item.firstDlr&&item.firstDlr.dlrxm">
-      <h3 class="fieldDescription">代理人信息</h3>
-      <a-descriptions title="" :column="2" class="verticallyCentered">
-        <a-descriptions-item label="代理人一姓名">
-          {{ item.firstDlr&&item.firstDlr.dlrxm }}
-        </a-descriptions-item>
-        <a-descriptions-item label="代理人一委托权限">
-          {{ filterDictTextByCache('wtqx',item.firstDlr&&item.firstDlr.wtqx) }}
-        </a-descriptions-item>
-        <a-descriptions-item label="代理人二姓名" v-if="item.sedDlr">
-          {{ item.sedDlr&&item.sedDlr.dlrxm }}
-        </a-descriptions-item>
-        <a-descriptions-item label="代理人二委托权限" v-if="item.sedDlr">
-          {{ filterDictTextByCache('wtqx',item.sedDlr&&item.sedDlr.wtqx) }}
-        </a-descriptions-item>
-        <a-descriptions-item label="证件资料" :span="2">
-          <div class="certificateContainer" :key="evidenceItem.id" v-for="evidenceItem in item.firstDlr&&item.firstDlr.identityFiles">
-            <a-card style="width: 200px" :bordered="false" size="small">
-              <img
-                slot="cover"
-                alt="example"
-                style="height:120px"
-                preview="agent"
-                :preview-text="filterDictTextByCache('file_type',evidenceItem.type)"
-                :src="`${downLoadUrl}/${evidenceItem.filePath}?id=${evidenceItem.id}`"
-              />
-              <a-card-meta>
-                <template slot="title">
-                  <div style="text-align:center">{{ filterDictTextByCache('file_type',evidenceItem.type) }}</div>
-                </template>
-              </a-card-meta>
-            </a-card>
-          </div>
-        </a-descriptions-item>
-      </a-descriptions>
-    </div> -->
   </div>
 </template>
 
 <script>
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》';
-// import { filterDictTextByCache } from '@/components/dict/JDictSelectUtil'
 export default {
   // import引入的组件需要注入到对象中才能使用
   props: {

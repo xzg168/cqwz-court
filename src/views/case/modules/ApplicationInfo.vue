@@ -4,7 +4,7 @@
     <h3 class="fieldDescription">请求信息</h3>
     <a-descriptions title="" :column="4">
       <a-descriptions-item label="案由">
-        <!-- {{ filterDictTextByCache('court_ay',applicationData.ay) }} -->
+        {{ applicationData.ay }}
       </a-descriptions-item>
       <a-descriptions-item label="案件费用(元)">
         {{ applicationData.cpmc }}
@@ -32,12 +32,7 @@
       </a-descriptions-item>
     </a-descriptions> -->
     <h3 class="fieldDescription">要素信息</h3>
-    <dynamic-descriptions
-      :optionsData="optionsData"
-      ref="dynamicElement"
-      v-if="optionsData && optionsData.length > 0"
-    />
-    <br v-else />
+    <dynamic-descriptions :optionsData="optionsData" ref="dynamicElement" />
     <h3 class="fieldDescription">原告信息</h3>
     <!-- 原告 -->
     <div v-for="(item, index1) in ygData" :key="index1 + 100">
@@ -45,49 +40,22 @@
       <NaturalOrPerson :item="item" />
     </div>
     <h3 class="fieldDescription">代理人信息</h3>
-    <a-descriptions title="" :column="2" class="verticallyCentered">
-      <a-descriptions-item label="代理人一姓名">
-        <!-- {{ item.firstDlr && item.firstDlr.dlrxm }} -->
-      </a-descriptions-item>
-      <a-descriptions-item label="代理人一委托权限">
-        <!-- {{ filterDictTextByCache("wtqx", item.firstDlr && item.firstDlr.wtqx) }} -->
-      </a-descriptions-item>
-      <a-descriptions-item label="代理人二姓名">
-        <!-- {{ item.sedDlr && item.sedDlr.dlrxm }} -->
-      </a-descriptions-item>
-      <a-descriptions-item label="代理人二委托权限">
-        <!-- {{ filterDictTextByCache("wtqx", item.sedDlr && item.sedDlr.wtqx) }} -->
-      </a-descriptions-item>
-      <a-descriptions-item label="证件资料" :span="2">
-        <!-- <div
-          class="certificateContainer"
-          :key="evidenceItem.id"
-          v-for="evidenceItem in item.firstDlr && item.firstDlr.identityFiles"
-        >
-          <a-card style="width: 200px" :bordered="false" size="small">
-            <img
-              slot="cover"
-              alt="example"
-              style="height:120px"
-              preview="agent"
-              :preview-text="
-                filterDictTextByCache('file_type', evidenceItem.type)
-              " 
-              :src="
-                `${downLoadUrl}/${evidenceItem.filePath}?id=${evidenceItem.id}`
-              "
-            />
-            <a-card-meta>
-              <template slot="title">
-                <div style="text-align:center">
-                  {{ filterDictTextByCache("file_type", evidenceItem.type) }}
-                </div>
-              </template>
-            </a-card-meta>
-          </a-card>
-        </div>-->
-      </a-descriptions-item>
-    </a-descriptions>
+    <Agent
+      :data="[
+        {
+          name: '张三',
+          idNo: '123456789',
+          tel: 15510067129,
+          identityFiles: [{ filePath: '', id: '123', fileName: 'yy' }]
+        },
+        {
+          name: '张三san',
+          idNo: '123456789',
+          tel: 15510067129,
+          identityFiles: [{ filePath: '', id: '123', fileName: 'yy' }]
+        }
+      ]"
+    />
     <h3 class="fieldDescription">被告信息</h3>
     <!-- 被告 -->
     <div v-for="(item, index2) in bgData" :key="index2">
@@ -104,16 +72,7 @@
         applicationData.indictmentDoc && applicationData.indictmentDoc.fileName
       "
     >
-      <a
-        @click="
-          previewFile(
-            applicationData.indictmentDoc.filePath,
-            applicationData.indictmentDoc.fileName,
-            applicationData.indictmentDoc.id
-          )
-        "
-        >{{ applicationData.indictmentDoc.fileName }}</a
-      >
+      <a @click="downFile">{{ applicationData.indictmentDoc.fileName }}</a>
     </div>
   </div>
 </template>
@@ -123,19 +82,656 @@ import DynamicDescriptions from "../components/DynamicDescriptions";
 import NaturalOrPerson from "../components/NaturalOrPerson";
 import { SectionToChinese } from "@/utils/util";
 import EvidenceFiles from "../components/EvidenceFiles";
+import Agent from "../components/Agent";
+// 动态要素字段格式，后台返回可以自己定义内容，这里只为展示
+const dtysData = [
+  {
+    type: "div",
+    class: ["fieldDesc"],
+    native: true,
+    children: ["要素基本信息"]
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "DatePicker",
+    field: "sfzdqr",
+    validate: [
+      {
+        required: true,
+        message: "请选择身份证到期日"
+      }
+    ],
+    props: {
+      format: "yyyy-MM-dd",
+      placeholder: "请选择身份证到期日",
+      disabled: true,
+      style: "width:100%"
+    },
+    title: "身份证到期日",
+    value: ""
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "InputNumber",
+    field: "jkbj",
+    validate: [
+      {
+        required: true,
+        message: "请输入借款本金"
+      },
+      {
+        type: "number",
+        message: "请输入正确的值"
+      }
+    ],
+    props: {
+      type: "text",
+      disabled: true,
+      style: "width:100%",
+      controls: false
+    },
+    title: "借款本金(元)",
+    value: ""
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "InputNumber",
+    field: "lsf",
+    validate: [
+      {
+        type: "number",
+        message: "请输入正确的值"
+      }
+    ],
+    props: {
+      type: "text",
+      disabled: true,
+      style: "width:100%",
+      controls: false
+    },
+    title: "律师费(元)",
+    value: ""
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "InputNumber",
+    field: "lx",
+    validate: [
+      {
+        required: true,
+        message: "请输入利息"
+      },
+      {
+        type: "number",
+        message: "请输入正确的值"
+      }
+    ],
+    props: {
+      type: "text",
+      disabled: true,
+      style: "width:100%",
+      controls: false
+    },
+    title: "利息(元)",
+    value: ""
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "InputNumber",
+    field: "fx",
+    validate: [
+      {
+        required: true,
+        message: "请输入罚息"
+      },
+      {
+        type: "number",
+        message: "请输入正确的值"
+      }
+    ],
+    props: {
+      type: "text",
+      disabled: true,
+      style: "width:100%",
+      controls: false
+    },
+    title: "罚息(元)",
+    value: ""
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "InputNumber",
+    field: "fl",
+    validate: [
+      {
+        required: true,
+        message: "请输入复利"
+      },
+      {
+        type: "number",
+        message: "请输入正确的值"
+      }
+    ],
+    props: {
+      type: "text",
+      disabled: true,
+      style: "width:100%",
+      controls: false
+    },
+    title: "复利(元)",
+    value: ""
+  },
+  {
+    type: "div",
+    class: ["fieldDesc"],
+    native: true,
+    children: ["合同基本信息"]
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "DatePicker",
+    field: "dkhtqdr",
+    validate: [
+      {
+        required: true,
+        message: "请选择贷款合同签订日"
+      }
+    ],
+    props: {
+      format: "yyyy-MM-dd",
+      placeholder: "请选择贷款合同签订日",
+      disabled: true,
+      style: "width:100%"
+    },
+    title: "贷款合同签订日",
+    value: ""
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "InputNumber",
+    field: "dked",
+    validate: [
+      {
+        required: true,
+        message: "请输入贷款额度"
+      },
+      {
+        type: "number",
+        message: "请输入正确的值"
+      }
+    ],
+    props: {
+      type: "text",
+      disabled: true,
+      style: "width:100%",
+      controls: false
+    },
+    title: "贷款额度(元)",
+    value: ""
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "DatePicker",
+    field: "dksqr",
+    validate: [
+      {
+        required: true,
+        message: "请选择贷款申请日"
+      }
+    ],
+    props: {
+      format: "yyyy-MM-dd",
+      placeholder: "请选择贷款申请日",
+      disabled: true,
+      style: "width:100%"
+    },
+    title: "贷款申请日",
+    value: ""
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "DatePicker",
+    field: "eddqr",
+    validate: [
+      {
+        required: true,
+        message: "请选择额度到期日"
+      }
+    ],
+    props: {
+      format: "yyyy-MM-dd",
+      placeholder: "请选择额度到期日",
+      disabled: true,
+      style: "width:100%"
+    },
+    title: "额度到期日",
+    emit: ["change"],
+    value: ""
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "DatePicker",
+    field: ".",
+    validate: [
+      {
+        required: true,
+        message: "请选择额度到期次日"
+      }
+    ],
+    props: {
+      format: "yyyy-MM-dd",
+      placeholder: "请选择额度到期次日",
+      disabled: true,
+      style: "width:100%"
+    },
+    title: "额度到期次日",
+    value: ""
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "DatePicker",
+    field: "htdqr",
+    validate: [
+      {
+        required: true,
+        message: "请选择合同到期日"
+      }
+    ],
+    props: {
+      format: "yyyy-MM-dd",
+      placeholder: "请选择合同到期日",
+      disabled: true,
+      style: "width:100%"
+    },
+    title: "合同到期日",
+    value: ""
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "InputNumber",
+    field: "nll",
+    validate: [
+      {
+        required: true,
+        message: "请输入年利率"
+      },
+      {
+        type: "number",
+        message: "请输入正确的值"
+      }
+    ],
+    props: {
+      type: "text",
+      disabled: true,
+      style: "width:100%",
+      precision: 6,
+      controls: false
+    },
+    title: "年利率",
+    value: ""
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "input",
+    field: "dkqs",
+    validate: [
+      {
+        required: true,
+        message: "请输入贷款期数"
+      }
+    ],
+    props: {
+      type: "text",
+      disabled: true
+    },
+    title: "贷款期数",
+    value: ""
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "input",
+    field: "dkzh",
+    validate: [
+      {
+        required: true,
+        message: "请输入贷款账号"
+      }
+    ],
+    props: {
+      type: "text",
+      disabled: true
+    },
+    title: "贷款账号",
+    value: ""
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "select",
+    field: "hkfs",
+    options: [
+      {
+        value: "到期一次性还本付息",
+        label: "到期一次性还本付息"
+      },
+      {
+        value: "按月付息到期还本",
+        label: "按月付息到期还本"
+      }
+    ],
+    props: {
+      disabled: true,
+      style: "width:100%"
+    },
+    title: "还款方式",
+    value: ""
+  },
+  {
+    type: "div",
+    class: ["fieldDesc"],
+    native: true,
+    children: ["逾期情况"]
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "radio",
+    title: "逾期类别",
+    field: "yqlb",
+    props: {
+      disabled: true
+    },
+    value: "0",
+    options: [
+      {
+        value: "0",
+        label: "到期前逾期"
+      },
+      {
+        value: "1",
+        label: "到期后逾期"
+      }
+    ]
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "DatePicker",
+    field: "dkyqr",
+    validate: [
+      {
+        required: true,
+        message: "请选择贷款逾期日"
+      }
+    ],
+    props: {
+      format: "yyyy-MM-dd",
+      placeholder: "请选择贷款逾期日",
+      disabled: true,
+      style: "width:100%"
+    },
+    title: "贷款逾期日",
+    value: ""
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "InputNumber",
+    field: "sqdkbj",
+    validate: [
+      {
+        required: true,
+        message: "请输入尚欠贷款本金"
+      },
+      {
+        type: "number",
+        message: "请输入正确的值"
+      }
+    ],
+    props: {
+      type: "text",
+      disabled: true,
+      style: "width:100%",
+      controls: false
+    },
+    title: "尚欠贷款本金(元)",
+    value: ""
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "InputNumber",
+    field: "sqqnlx",
+    validate: [
+      {
+        required: true,
+        message: "请输入尚欠期内利息"
+      },
+      {
+        type: "number",
+        message: "请输入正确的值"
+      }
+    ],
+    props: {
+      type: "text",
+      disabled: true,
+      style: "width:100%",
+      controls: false
+    },
+    title: "尚欠期内利息(元)",
+    value: ""
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "DatePicker",
+    field: "yhzdr",
+    validate: [
+      {
+        required: true,
+        message: "请选择银行自定日"
+      }
+    ],
+    props: {
+      format: "yyyy-MM-dd",
+      placeholder: "请选择银行自定日",
+      disabled: true,
+      style: "width:100%"
+    },
+    emit: ["change"],
+    title: "银行自定日",
+    value: ""
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "DatePicker",
+    field: "yhzdrcr",
+    validate: [
+      {
+        required: true,
+        message: "请选择银行自定日次日"
+      }
+    ],
+    props: {
+      format: "yyyy-MM-dd",
+      placeholder: "请选择银行自定日次日",
+      disabled: true,
+      style: "width:100%"
+    },
+    title: "银行自定日次日",
+    value: ""
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "input",
+    field: "edqx",
+    validate: [
+      {
+        required: true,
+        message: "请选择额度期限"
+      }
+    ],
+    props: {
+      type: "text",
+      disabled: true
+    },
+    title: "额度期限",
+    value: ""
+  },
+  {
+    col: {
+      xs: {
+        span: 24
+      },
+      span: 8
+    },
+    type: "InputNumber",
+    field: "yqhchfx",
+    validate: [
+      {
+        required: true,
+        message: "请输入逾期后偿还的罚息"
+      },
+      {
+        type: "number",
+        message: "请输入正确的值"
+      }
+    ],
+    props: {
+      type: "text",
+      disabled: true,
+      style: "width:100%",
+      controls: false
+    },
+    title: "逾期后偿还的罚息(元)",
+    value: ""
+  }
+];
 export default {
-  components: { DynamicDescriptions, NaturalOrPerson, EvidenceFiles },
+  components: { DynamicDescriptions, NaturalOrPerson, EvidenceFiles, Agent },
   data() {
     // 这里存放数据
     return {
-      // downLoadUrl: window._CONFIG["domianURL"],
+      // 以下字段根据字段自行修改，这里只为展示静态数据
       applicationData: {
         indictmentDoc: {},
-        evidences: []
+        evidences: [
+          { zjmc: "证据", zjsm: "123", evidenceFiles: [] },
+          { zjmc: "证据", zjsm: "123", evidenceFiles: [] }
+        ]
       },
-      bgData: [{ dsrlx: "1" }],
+      bgData: [{ dsrlx: "1" }, { dsrlx: "2" }],
       ygData: [{ dsrlx: "2" }],
-      optionsData: []
+      optionsData: dtysData
     };
   },
   // 监听属性 类似于data概念
@@ -145,22 +741,12 @@ export default {
   // 方法集合
   methods: {
     SectionToChinese,
-    // filterDictTextByCache,
-    // downloadFile,
-    // previewFile(filePath, fileName, params) {
-    //   this.$refs.pdfRef.add(filePath, fileName, params)
-    // },
-    previewFile(filePath, fileName, fileId) {
-      // this.$refs.pdfRef.add(filePath, fileName, params)
-      const query = { filePath, fileName, fileId };
-      let routeData = this.$router.resolve({
-        name: "pdf",
-        query: query
-      });
-      window.open(routeData.href, "_blank");
-    },
+    // 下载附件
+    downFile() {},
+    // 获取详情
     getInfo(id) {
-      // getAction(`/ajjbxx/spAjjbxx/queryById`, { id: id }).then(res => {
+      // 发起申请信息请求
+      // this.$http.get(`/ajjbxx/spAjjbxx/queryById`, { params:{id: id} }).then(res => {
       //   console.log("申请信息res", res);
       //   if (res.success) {
       //     this.applicationData = res.result;
@@ -180,12 +766,13 @@ export default {
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
-  created() {
-    // setTimeout(() => {
-    //   this.setData()
-    // }, 1000)
-  },
+  created() {},
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {}
 };
 </script>
+<style scoped lang="css">
+.dsrBj {
+  font-weight: bold;
+}
+</style>

@@ -69,6 +69,16 @@ export default {
       this.form.validateFields((err, values) => {
         if (!err) {
           console.log("Received values of form: ", values);
+          this.$store.dispatch("setUserInfo", {
+            account: "admin",
+            create_time: "2021-02-02 14:47:35",
+            id: 1,
+            is_flag: 1,
+            is_type: 1,
+            mailbox: "123@qq.com",
+            name: "管理员",
+            password: "123456"
+          });
           this.$http.post("/admin/login", values).then(res => {
             if (res.code === 0) {
               this.$store.dispatch("setUserInfo", res.data);

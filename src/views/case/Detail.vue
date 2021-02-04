@@ -65,12 +65,17 @@ export default {
   methods: {
     // 获取案件基本信息
     getInfo() {
-      // getAction('/ajjbxx/spAjjbxx/queryById', { id: this.detailId }).then((res) => {
-      //   this.ah = res.result.ah;
-      // })
-      // this.$nextTick(() => {
-      //   this.$refs.applicationRef.getInfo(this.detailId)
-      // })
+      // 案件基本信息
+      this.$http
+        .get("/case/detail", { params: { id: this.detailId } })
+        .then(res => {
+          if (res.code === 200) {
+          }
+        });
+      // 申请信息
+      this.$nextTick(() => {
+        this.$refs.applicationRef.getInfo(this.detailId);
+      });
     },
     changeTabCallback(key) {
       this.activeKey = key;

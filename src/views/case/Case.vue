@@ -70,7 +70,7 @@
               <a-date-picker
                 placeholder="请选择申请时间"
                 v-model="queryParam.atime"
-                valueFormat="YYYY-MM-DD"
+                valueFormat="x"
               />
             </a-form-item>
           </a-col>
@@ -110,7 +110,7 @@
                 <a-select-option value="lucy">
                   执行失败
                 </a-select-option>
-                <a-select-option value="disabled" disabled>
+                <a-select-option value="disabled">
                   正在执行
                 </a-select-option>
               </a-select>
@@ -180,7 +180,7 @@
     <div :style="{ textAlign: 'right', padding: '20px 0' }">
       <a-pagination
         show-quick-jumper
-        v-model="queryParam.current"
+        v-model="queryParam.pageNum"
         :total="total"
         :page-size.sync="queryParam.pageSize"
         show-size-changer
@@ -245,10 +245,10 @@ export default {
       queryParam: {
         caseType: "a",
         pageSize: 20,
-        current: 1
+        pageNum: 1
       },
       // 数据总数
-      total: 200,
+      total: 0,
       // 选中条数key值
       selectedRowKeys: [],
       // 列表数据
@@ -341,7 +341,6 @@ export default {
         {
           title: "操作",
           align: "center",
-          dataIndex: "address12",
           fixed: "right",
           scopedSlots: { customRender: "action" }
         }
@@ -358,7 +357,12 @@ export default {
     // 获取列表项
     getData() {
       let params = JSON.parse(JSON.stringify(this.queryParam));
-      this.$http.get("/list", { params: params });
+      this.$http.get("/list", { params: params }).then(res => {
+        if (res.code === 200) {
+          this.data = this.data.list;
+          this.total = res.data.total;
+        }
+      });
     },
     // 查询方法
     searchQuery() {
@@ -370,12 +374,13 @@ export default {
       this.queryParam = {
         caseType: "a",
         pageSize: 20,
-        current: 1
+        pageNum: 1
       };
+      this.getData();
     },
     // 跳转详情页
     goDetail(record) {
-      this.$router.push("/case/detail/123");
+      this.$router.push(`/case/detail/${record.id}`);
     },
     // 分页跳转
     onPagChange(pageNumber) {
@@ -391,7 +396,7 @@ export default {
     // 显示分页pageSize
     onShowSizeChange(current, pageSize) {
       console.log(current, pageSize);
-      this.queryParam.current = current;
+      this.queryParam.pageNum = current;
       this.queryParam.pageSize = pageSize;
       this.getData();
     },

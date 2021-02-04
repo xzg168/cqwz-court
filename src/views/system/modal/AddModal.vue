@@ -105,7 +105,6 @@ export default {
       this.title = "添加产品";
     },
     edit(record) {
-      console.log(record, "嘻嘻嘻嘻嘻嘻寻");
       this.form.resetFields();
       if (record.is_type === 1) {
         record.is_type = "checked";

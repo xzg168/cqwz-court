@@ -13,7 +13,8 @@
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="账号">
-          <a-input v-decorator="['zName', validatorRules.zName]"> </a-input>
+          <a-input v-decorator="['account', validatorRules.account]" disabled>
+          </a-input>
         </a-form-item>
 
         <a-form-item
@@ -21,24 +22,24 @@
           :wrapperCol="wrapperCol"
           label="成员姓名"
         >
-          <a-input v-decorator="['cName']" />
+          <a-input v-decorator="['name']" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="邮箱地址"
         >
-          <a-input v-decorator="['yName']" />
+          <a-input v-decorator="['mailbox']" />
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="密码">
-          <a-input v-decorator="['mm']" />
+          <a-input v-decorator="['password']" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="备注信息"
         >
-          <a-textarea v-decorator="['cName']" />
+          <a-textarea v-decorator="['bz']" />
         </a-form-item>
       </a-form>
     </a-spin>
@@ -67,7 +68,7 @@ export default {
       confirmLoading: false,
       form: this.$form.createForm(this),
       validatorRules: {
-        zName: {
+        account: {
           rules: [
             { required: true, message: "请输入账号!" },
             {
@@ -90,18 +91,14 @@ export default {
       this.form.resetFields();
       this.model = Object.assign({}, record);
       this.visible = true;
-
       //编辑页面禁止修改角色编码
-      if (this.model.id) {
-        this.roleDisabled = true;
-      } else {
-        this.roleDisabled = false;
-      }
+      // if (this.model.id) {
+      //   this.roleDisabled = true;
+      // } else {
+      //   this.roleDisabled = false;
+      // }
       this.$nextTick(() => {
-        this.form
-          .setFieldsValue
-          //   pick(this.model, "roleName", "description", "roleCode")
-          ();
+        this.form.setFieldsValue(this.model);
       });
     },
     close() {
@@ -115,13 +112,26 @@ export default {
         if (!err) {
           that.confirmLoading = true;
           let formData = Object.assign(this.model, values);
-          let obj;
           console.log(formData);
+          this.$http.post("/admin/update", { ...formData }).then(res => {
+            if (res.code === 200) {
+              this.confirmLoading = false;
+              this.visible = false;
+              this.getUserInfo(formData.id);
+            }
+          });
         }
       });
     },
     handleCancel() {
       this.close();
+    },
+    getUserInfo(id) {
+      this.$http.get("/admin/detail", { params: { id: id } }).then(res => {
+        if (res.code === 200) {
+          this.$store.dispatch("setUserInfo", res.data);
+        }
+      });
     }
   }
 };
