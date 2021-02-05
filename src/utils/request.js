@@ -44,7 +44,7 @@ service.interceptors.response.use(
     } else if (code !== 200) {
       notification.error({
         message: "系统提示",
-        description: res.msg,
+        description: res.data.message,
         duration: 4
       });
       return Promise.reject("error");

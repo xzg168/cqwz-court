@@ -80,16 +80,17 @@ export default {
             password: "123456"
           });
           this.$http.post("/admin/login", values).then(res => {
-            if (res.code === 0) {
+            if (res.code === 200) {
               this.$store.dispatch("setUserInfo", res.data);
               setToken(res.data.id);
+              window.sessionStorage.setItem("token", "123");
+              this.$router.push("/");
+              setToken("123");
             } else {
-              this.$message.erro(res.message);
+              // this.$message.erro(res.message);
             }
           });
-          window.sessionStorage.setItem("token", "123");
-          this.$router.push("/");
-          setToken("123");
+
         }
       });
     }
