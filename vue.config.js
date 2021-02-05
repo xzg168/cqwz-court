@@ -23,6 +23,16 @@ module.exports = {
       }
     }
   },
+  pwa: {
+    iconPaths: {
+      faviconSVG: "favicon.ico",
+      favicon32: "favicon.ico",
+      favicon16: "favicon.ico",
+      appleTouchIcon: "favicon.ico",
+      maskIcon: "favicon.ico",
+      msTileImage: "favicon.ico"
+    }
+  },
   devServer: {
     proxy: {
       // detail: https://cli.vuejs.org/config/#devserver-proxy
@@ -30,7 +40,7 @@ module.exports = {
         target: `http://localhost:8080`,
         changeOrigin: true,
         pathRewrite: {
-          ["^/pai"]: ""
+          ["^/api"]: ""
         }
       }
     },

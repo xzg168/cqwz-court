@@ -29,21 +29,19 @@
           label="关联文书"
         >
           <a-select
-            default-value="lucy"
             style="width: 100%"
-            v-decorator="['document_ids', validatorRules.gName]"
+            @search="getWslist"
+            show-search
+            mode="multiple"
+            :labelInValue="true"
+            v-decorator="['productDocuments']"
           >
-            <a-select-option value="jack">
-              Jack
-            </a-select-option>
-            <a-select-option value="lucy">
-              Lucy
-            </a-select-option>
-            <a-select-option value="disabled" disabled>
-              Disabled
-            </a-select-option>
-            <a-select-option value="Yiminghe">
-              yiminghe
+            <a-select-option
+              :value="item.id"
+              :key="item.id"
+              v-for="item in wsList"
+            >
+              {{ item.document_name }}
             </a-select-option>
           </a-select>
         </a-form-item>
@@ -95,16 +93,47 @@ export default {
             }
           ]
         }
-      }
+      },
+      wsList: []
     };
   },
   created() {},
   methods: {
+    getWslist(name) {
+      this.wsList = [
+        {
+          create_time: "1612318194159",
+          document_content: "11111",
+          document_describe: "乐高好玩",
+          document_name: "文书1",
+          id: 1,
+          is_flag: 1,
+          is_type: 1
+        },
+        {
+          create_time: "1612405143902",
+          document_content: "12221",
+          document_describe: "乐高好玩2",
+          document_name: "文书2",
+          id: 2,
+          is_flag: 1,
+          is_type: 1
+        }
+      ];
+      this.$http
+        .get("/document/maintain/allList", { params: { document_name: name } })
+        .then(res => {
+          if (res.code === 200) {
+            this.wsList = res.data;
+          }
+        });
+    },
     add() {
       this.edit({});
       this.title = "添加产品";
     },
     edit(record) {
+      this.confirmLoading = false;
       this.form.resetFields();
       if (record.is_type === 1) {
         record.is_type = "checked";
@@ -144,6 +173,14 @@ export default {
             formData.is_type = 2;
           }
           console.log(formData);
+          if (formData.productDocuments.length > 0) {
+            let temWs = [];
+            formData.productDocuments.map(item => {
+              temWs.push({ document_id: item.key, document_name: item.label });
+            });
+            formData.productDocuments = temWs;
+          }
+          console.log("222222222222222", formData);
           if (this.roleDisabled) {
             this.$http.post("/product/update", { ...formData }).then(res => {
               if (res.code === 200) {
