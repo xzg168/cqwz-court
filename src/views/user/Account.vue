@@ -101,7 +101,7 @@ const data = [
     name: "John Brown",
     is_type: 1,
     mailbox: "123@qq.com",
-    create_time: "2021-2-9",
+    create_time: "1612494373558",
     account: "admin"
   },
   {
@@ -109,7 +109,7 @@ const data = [
     name: "John Brown",
     is_type: 1,
     mailbox: "123@qq.com",
-    create_time: "2021-2-9",
+    create_time: "1612494373558",
     account: "admin"
   },
   {
@@ -117,7 +117,7 @@ const data = [
     name: "John Brown",
     is_type: 2,
     mailbox: "123@qq.com",
-    create_time: "2021-2-9",
+    create_time: "1612494373558",
     account: "admin"
   }
 ];
@@ -157,7 +157,7 @@ export default {
           dataIndex: "create_time",
           align: "center",
           customRender: text => {
-            return moment(text).format("YYYY-MM-DD");
+            return moment(parseInt(text)).format("YYYY-MM-DD");
           }
         },
         {
