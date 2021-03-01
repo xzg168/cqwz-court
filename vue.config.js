@@ -5,12 +5,18 @@ module.exports = {
       args[0].title = "重庆万州法院";
       return args;
     });
+    config.module
+      .rule("js")
+      .test(/\.js$/)
+      .use("babel-loader")
+      .loader("babel-loader");
   },
   // 关闭生产环境console
   configureWebpack(config) {
     if (process.env.NODE_ENV === "production") {
       config.optimization.minimizer[0].options.terserOptions.compress.drop_console = true;
     }
+    config.entry.app = ["babel-polyfill", "./src/main.js"];
   },
   css: {
     loaderOptions: {
