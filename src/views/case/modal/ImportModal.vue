@@ -25,15 +25,6 @@
             <a-select-option value="jack">
               Jack
             </a-select-option>
-            <a-select-option value="lucy">
-              Lucy
-            </a-select-option>
-            <a-select-option value="disabled" disabled>
-              Disabled
-            </a-select-option>
-            <a-select-option value="Yiminghe">
-              yiminghe
-            </a-select-option>
           </a-select>
         </a-form-item>
 
@@ -102,10 +93,13 @@ export default {
       }
     };
   },
-  created() {},
+  created() {
+
+  },
   methods: {
     add() {
       this.edit({});
+      console.log("111111");
     },
     edit(record) {
       this.form.resetFields();

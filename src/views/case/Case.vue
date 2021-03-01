@@ -3,31 +3,31 @@
   <div class="">
     <div>
       <a-radio-group
-        default-value="a"
-        button-style="solid"
-        size="large"
-        v-model="queryParam.caseType"
-        @change="changeCaseType"
+          default-value="a"
+          button-style="solid"
+          size="large"
+          v-model="queryParam.caseType"
+          @change="changeCaseType"
       >
-        <a-radio-button value="a">
+        <a-radio-button value="0">
           全部案件
         </a-radio-button>
-        <a-radio-button value="b">
+        <a-radio-button value="1">
           待收案
         </a-radio-button>
-        <a-radio-button value="c">
+        <a-radio-button value="2">
           待立案
         </a-radio-button>
-        <a-radio-button value="d">
+        <a-radio-button value="3">
           待排期
         </a-radio-button>
-        <a-radio-button value="e">
+        <a-radio-button value="4">
           待结案
         </a-radio-button>
-        <a-radio-button value="f">
+        <a-radio-button value="5">
           待提交送达结案信息
         </a-radio-button>
-        <a-radio-button value="g">
+        <a-radio-button value="6">
           已结案
         </a-radio-button>
       </a-radio-group>
@@ -39,78 +39,81 @@
         <a-row :gutter="24">
           <a-col :md="6" :sm="8">
             <a-form-item
-              label="案件编号"
-              :labelCol="{ span: 6 }"
-              :wrapperCol="{ span: 17, offset: 1 }"
+                label="案件编号"
+                :labelCol="{ span: 6 }"
+                :wrapperCol="{ span: 17, offset: 1 }"
             >
               <a-input
-                placeholder="请输入案件编号"
-                v-model="queryParam.caseNum"
+                  placeholder="请输入案件编号"
+                  v-model="queryParam.case_num"
               ></a-input>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
             <a-form-item
-              label="案件号"
-              :labelCol="{ span: 6 }"
-              :wrapperCol="{ span: 17, offset: 1 }"
+                label="案件号"
+                :labelCol="{ span: 6 }"
+                :wrapperCol="{ span: 17, offset: 1 }"
             >
               <a-input
-                placeholder="请输入案件号"
-                v-model="queryParam.caseno"
+                  placeholder="请输入案件号"
+                  v-model="queryParam.caseno"
               ></a-input>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
             <a-form-item
-              label="申请时间"
-              :labelCol="{ span: 6 }"
-              :wrapperCol="{ span: 17, offset: 1 }"
+                label="申请时间"
+                :labelCol="{ span: 6 }"
+                :wrapperCol="{ span: 17, offset: 1 }"
             >
               <a-date-picker
-                placeholder="请选择申请时间"
-                v-model="queryParam.atime"
-                valueFormat="x"
+                  placeholder="请选择申请时间"
+                  v-model="queryParam.atime"
+                  valueFormat="x"
               />
             </a-form-item>
           </a-col>
           <span
-            style="float: left;overflow: hidden;"
-            class="table-page-search-submitButtons"
+              style="float: left;overflow: hidden;"
+              class="table-page-search-submitButtons"
           >
             <a-col :md="6" :sm="8">
               <a-button type="primary" @click="searchQuery">查询</a-button>
               <a-button style="margin-left: 8px" @click="searchReset"
-                >重置</a-button
+              >重置</a-button
               >
             </a-col>
           </span>
           <a-col :md="6" :sm="8">
             <a-form-item
-              label="申请人"
-              :labelCol="{ span: 6 }"
-              :wrapperCol="{ span: 17, offset: 1 }"
+                label="申请人"
+                :labelCol="{ span: 6 }"
+                :wrapperCol="{ span: 17, offset: 1 }"
             >
               <a-input
-                placeholder="请输入申请人"
-                v-model="queryParam.pep"
+                  placeholder="请输入申请人"
+                  v-model="queryParam.pep"
               ></a-input>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
             <a-form-item
-              label="执行"
-              :labelCol="{ span: 6 }"
-              :wrapperCol="{ span: 17, offset: 1 }"
+                label="执行"
+                :labelCol="{ span: 6 }"
+                :wrapperCol="{ span: 17, offset: 1 }"
             >
-              <a-select style="width: 180px" v-model="queryParam.excut">
-                <a-select-option value="jack">
+              <a-select style="width: 180px" v-model="queryParam.implement_state">
+                <a-select-option value="0">
                   请选择
                 </a-select-option>
-                <a-select-option value="lucy">
+                <a-select-option value="1">
+                  未执行
+                </a-select-option>
+                <a-select-option value="2">
                   执行失败
                 </a-select-option>
-                <a-select-option value="disabled">
+                <a-select-option value="3">
                   正在执行
                 </a-select-option>
               </a-select>
@@ -120,27 +123,30 @@
       </a-form>
     </div>
     <a-table
-      :columns="columns"
-      :data-source="data"
-      bordered
-      rowKey="id"
-      :row-selection="rowSelection"
-      :scroll="{ x: 'calc(1700px + 80%)' }"
-      :pagination="false"
+        :columns="columns"
+        :data-source="data"
+        bordered
+        rowKey="id"
+        :row-selection="rowSelection"
+        :scroll="{ x: 'calc(1700px + 80%)' }"
+        :pagination="false"
     >
       <template slot="name" slot-scope="text">
         <a>{{ text }}</a>
       </template>
       <template slot="title">
         <a-row>
-          <a-col :span="12"><a-icon type="database" />数据列表</a-col>
+          <a-col :span="12">
+            <a-icon type="database"/>
+            数据列表
+          </a-col>
           <a-col
-            :span="12"
-            :style="{ textAlign: 'right' }"
-            v-if="queryParam.caseType !== 'a'"
-            class="tableBtn"
+              :span="12"
+              :style="{ textAlign: 'right' }"
+              v-if="queryParam.caseType !== '0'"
+              class="tableBtn"
           >
-            <template v-if="queryParam.caseType === 'b'">
+            <template v-if="queryParam.caseType === '1'">
               <a-button type="primary" @click="handleImport">
                 导入
               </a-button>
@@ -148,47 +154,47 @@
                 收案
               </a-button>
             </template>
-            <template v-if="queryParam.caseType === 'c'">
+            <template v-if="queryParam.caseType === '2'">
               <a-button type="primary">
                 立案
               </a-button>
             </template>
-            <template v-if="queryParam.caseType === 'd'">
+            <template v-if="queryParam.caseType === '3'">
               <a-button type="primary">
                 排期
               </a-button>
             </template>
-            <template v-if="queryParam.caseType === 'e'">
+            <template v-if="queryParam.caseType === '4'">
               <a-button type="primary">
                 结案
               </a-button>
             </template>
-            <a-button type="primary" v-if="queryParam.caseType === 'f'">
+            <a-button type="primary" v-if="queryParam.caseType === '5'">
               待提交送达结案信息
             </a-button>
           </a-col>
         </a-row>
       </template>
       <a
-        slot="action"
-        slot-scope="text"
-        href="javascript:;"
-        @click="goDetail(text)"
-        >详情</a
+          slot="action"
+          slot-scope="text"
+          href="javascript:;"
+          @click="goDetail(text)"
+      >详情</a
       >
     </a-table>
     <div :style="{ textAlign: 'right', padding: '20px 0' }">
       <a-pagination
-        show-quick-jumper
-        v-model="queryParam.pageNum"
-        :total="total"
-        :page-size.sync="queryParam.pageSize"
-        show-size-changer
-        @showSizeChange="onShowSizeChange"
-        @change="onPagChange"
+          show-quick-jumper
+          v-model="queryParam.pageNum"
+          :total="total"
+          :page-size.sync="queryParam.pageSize"
+          show-size-changer
+          @showSizeChange="onShowSizeChange"
+          @change="onPagChange"
       />
     </div>
-    <ImportModal ref="importRef" />
+    <ImportModal ref="importRef"/>
   </div>
 </template>
 
@@ -196,6 +202,7 @@
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
 import ImportModal from "./modal/ImportModal";
+
 const data = [
   {
     id: "1",
@@ -220,7 +227,7 @@ const data = [
 export default {
   props: {},
   //import引入的组件需要注入到对象中才能使用
-  components: { ImportModal },
+  components: {ImportModal},
   data() {
     //这里存放数据
     return {
@@ -228,9 +235,9 @@ export default {
       rowSelection: {
         onChange: (selectedRowKeys, selectedRows) => {
           console.log(
-            `selectedRowKeys: ${selectedRowKeys}`,
-            "selectedRows: ",
-            selectedRows
+              `selectedRowKeys: ${selectedRowKeys}`,
+              "selectedRows: ",
+              selectedRows
           );
           this.selectedRowKeys = selectedRowKeys;
         }
@@ -243,10 +250,12 @@ export default {
       },
       // 查询条件
       queryParam: {
-        caseType: "a",
+        caseType: "0",
         pageSize: 20,
-        pageNum: 1
+        pageNum: 1,
       },
+      //产品对象列表
+      productDataList: [{id: '', product_name: ''}],
       // 数据总数
       total: 0,
       // 选中条数key值
@@ -265,7 +274,7 @@ export default {
           title: "案件号",
           dataIndex: "name",
           align: "center",
-          scopedSlots: { customRender: "name" }
+          scopedSlots: {customRender: "name"}
         },
         {
           title: "案由",
@@ -342,7 +351,7 @@ export default {
           title: "操作",
           align: "center",
           fixed: "right",
-          scopedSlots: { customRender: "action" }
+          scopedSlots: {customRender: "action"}
         }
       ],
       loading: false
@@ -357,7 +366,7 @@ export default {
     // 获取列表项
     getData() {
       let params = JSON.parse(JSON.stringify(this.queryParam));
-      this.$http.get("/list", { params: params }).then(res => {
+      this.$http.get("/case/info/list", {params: params}).then(res => {
         if (res.code === 200) {
           this.data = this.data.list;
           this.total = res.data.total;
@@ -372,7 +381,7 @@ export default {
     // 查询方法重置
     searchReset() {
       this.queryParam = {
-        caseType: "a",
+        caseType: "0",
         pageSize: 20,
         pageNum: 1
       };
@@ -402,7 +411,17 @@ export default {
     },
     // 导入
     handleImport() {
+      this.getProductAllList();
       this.$refs.importRef.add();
+    },
+    //获取产品列表（无分页）
+    getProductAllList() {
+      let params = JSON.parse(JSON.stringify(this.queryParam));
+      this.$http.get("/product/allList", {params: params}).then(res => {
+        if (res.code === 200) {
+          this.productDataList = this.data;
+        }
+      });
     }
   },
   //生命周期 - 创建完成（可以访问当前this实例）
@@ -410,14 +429,22 @@ export default {
     this.getData();
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
-  mounted() {},
-  beforeCreate() {}, //生命周期 - 创建之前
-  beforeMount() {}, //生命周期 - 挂载之前
-  beforeUpdate() {}, //生命周期 - 更新之前
-  updated() {}, //生命周期 - 更新之后
-  beforeDestroy() {}, //生命周期 - 销毁之前
-  destroyed() {}, //生命周期 - 销毁完成
-  activated() {} //如果页面有keep-alive缓存功能，这个函数会触发
+  mounted() {
+  },
+  beforeCreate() {
+  }, //生命周期 - 创建之前
+  beforeMount() {
+  }, //生命周期 - 挂载之前
+  beforeUpdate() {
+  }, //生命周期 - 更新之前
+  updated() {
+  }, //生命周期 - 更新之后
+  beforeDestroy() {
+  }, //生命周期 - 销毁之前
+  destroyed() {
+  }, //生命周期 - 销毁完成
+  activated() {
+  } //如果页面有keep-alive缓存功能，这个函数会触发
 };
 </script>
 <style lang="css" scoped>
